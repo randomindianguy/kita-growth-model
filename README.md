@@ -1,4 +1,21 @@
 # Kita Growth Engine
 
-Interactive growth model for Kita (YC W26).
-View on [https://kita-growth.vercel.app/](url)
+An interactive growth model for [Kita](https://usekita.com) (YC W26) — document intelligence for lending in emerging markets.
+
+Drag the sliders to see how retention, activation, and monetization each move Month 12 MRR. Assumptions are editable — plug in real numbers to make it yours.
+
+**[Live Demo →](https://your-vercel-url.vercel.app)**
+
+## What This Is
+
+A single-page React app that models three growth levers for an early-stage B2B fintech:
+
+- **Retention** — framed as a PMF diagnostic, not just a churn metric
+- **Activation** — integration drop-off and time-to-value for developer-facing products
+- **Monetization** — pricing research to find the actual acceptable range
+
+Each lever shows independent MRR impact. The chart shows combined (multiplicative) effects. A 30-day plan dynamically reorders by remaining upside as you move the sliders.
+
+## Context
+
+Built by [Sidharth Sundaram](https://sidharthsundaram.com) as a growth analysis exercise. Not affiliated with Kita.
