@@ -2,7 +2,7 @@ import { useState } from "react";
 
 /* ───────── editable baseline assumptions ───────── */
 const DEFAULT_ASSUMPTIONS = {
-  customers: 15,
+  customers: 20,
   arpu: 6,
   churnRate: 5,
   activationRate: 35,
@@ -42,14 +42,14 @@ const LEVERS = [
     max: 10,
     step: 0.5,
     direction: "lower-is-better",
-    insight: "Each percentage point of churn compounds monthly. At 5% monthly churn, you lose ~46% of your base in a year. At 2%, you keep ~78%. The gap widens every month — it's exponential, not linear.",
+    insight: "At this stage, churn isn't a math problem — it's a diagnostic. Each lost customer is a case study in what's not working. If your early customers are staying, that's your PMF signal: you're ready to scale acquisition. If they're not, more leads won't fix it — you'd be spending to fill a pool you haven't sealed.",
     tactics: [
       "Health Score dashboard: flag accounts when doc volume drops >30% MoM",
       "Recovery playbook: auto-email (Day 1) → call (Day 3) → incentive (Day 7) → founder outreach (Day 14)",
       "Monthly check-in emails showing ROI: fraud caught, hours saved, cost reduced — takes 10 min to personalize",
-      "Weekly value reports: \"You caught 3 frauds worth ₱400K this week\""
+      "Weekly value reports: e.g. \"You caught 3 frauds worth ₱400K this week\""
     ],
-    analogy: "Like a leaky bucket — you can pour water faster (acquire more), but plugging the holes (retention) is 3× more capital-efficient."
+    analogy: "Think of early customers like a beta test with real stakes. You're not optimizing a funnel yet — you're learning whether the product delivers what you promised. Retention at this stage tells you whether to step on the gas or fix the engine first."
   },
   {
     id: "arpu",
@@ -63,7 +63,7 @@ const LEVERS = [
     max: 20,
     step: 0.5,
     direction: "higher-is-better",
-    insight: "If Kita catches $100K/year in fraud for a customer, a $20K/year price (20% of value delivered) is entirely defensible. A Van Westendorp survey on your current customer base will reveal the actual acceptable range — most B2B infra companies are underpriced early on.",
+    insight: "If Kita saves a customer, say, $100K/year in fraud losses, then a $20K/year price point (20% of value delivered) becomes easy to justify. A Van Westendorp survey on your current base would reveal the actual acceptable range — most B2B infra companies are underpriced early on.",
     tactics: [
       "Run Van Westendorp pricing survey to find your actual acceptable price range",
       "Structure Good-Better-Best tiers using MaxDiff feature ranking from customers",
@@ -158,7 +158,7 @@ function generateCoreInsight(assumptions, churn, arpu, activation) {
   const acqImpact = modified.find(i => i.leverId === "activation");
   const retMonImpact = modified.filter(i => i.leverId !== "activation");
   if (retMonImpact.length >= 2 && acqImpact && retMonImpact.reduce((s, i) => s + i.pct, 0) > acqImpact.pct * 1.5) {
-    return `Retention + monetization are driving ${retMonImpact.reduce((s, i) => s + i.pct, 0)}% combined uplift vs ${acqImpact.pct}% from activation alone. Fixing the bucket matters more than pouring faster.`;
+    return `Retention + monetization are driving ${retMonImpact.reduce((s, i) => s + i.pct, 0)}% combined uplift vs ${acqImpact.pct}% from activation alone. Retention confirms PMF; monetization funds the next phase of growth.`;
   }
   return `Largest lever: ${top.label} at +${top.pct}%. ${modified.length > 1 ? `Combined with ${modified[1].label} (+${modified[1].pct}%), these compound — the chart reflects their multiplicative effect.` : ""}`;
 }
@@ -511,7 +511,7 @@ export default function KitaGrowthEngine() {
                 border: "1px dashed rgba(200,170,80,0.15)",
               }}>
                 <div style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", lineHeight: 1.6 }}>
-                  These numbers are illustrative estimates based on publicly available context and typical Series A fintech benchmarks.
+                  These are placeholder assumptions for a post-YC-launch startup — plug in your real numbers using the panel above.
                   <span style={{ color: "rgba(200,170,80,0.8)", fontWeight: 600 }}> Edit any value</span> to calibrate with your actual metrics — all projections recalculate instantly.
                 </div>
               </div>
@@ -675,7 +675,11 @@ export default function KitaGrowthEngine() {
               What I'd ship in <span style={{ color: "rgba(107,142,80,0.9)" }}>30 days.</span>
             </h2>
             <p style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", lineHeight: 1.6 }}>
-              Three scoped initiatives tied to the levers above — ranked by remaining upside. Drag the sliders and watch the priorities shift.
+              Three scoped initiatives tied to the levers above — ranked by remaining upside. {
+                effectiveChurn <= 2 && effectiveArpu >= 9 && effectiveActivation >= 60
+                  ? "All targets set. Here's how I'd get there."
+                  : "Drag the sliders and watch the priorities shift."
+              }
             </p>
           </div>
 
@@ -685,7 +689,7 @@ export default function KitaGrowthEngine() {
                 leverId: "churn",
                 lever: "Retention",
                 title: "Build an automated early-warning system for churn",
-                what: "Design a lightweight health score that runs off existing product data — doc volume trends, login frequency, error rates. Wire it to automated email triggers so at-risk accounts get a nudge without anyone manually monitoring a dashboard. Two founders can't play customer success for 15+ accounts — the system has to do the watching.",
+                what: "Design a lightweight health score that runs off existing product data — doc volume trends, login frequency, error rates. Wire it to automated email triggers so at-risk accounts get a nudge without anyone manually monitoring a dashboard. At this stage, it doubles as a learning tool: every churn signal teaches you what to fix in the product before you scale.",
                 deliverable: "Health score logic + automated email sequences (built in product or a simple tool like Customer.io)",
                 metric: "Catch at-risk accounts 14 days before they'd otherwise go silent",
               },
@@ -723,13 +727,14 @@ export default function KitaGrowthEngine() {
               remaining: Math.max(0, item.upside - item.currentImpact),
             })).sort((a, b) => b.remaining - a.remaining);
 
+            const allAtTarget = remainingUpside.every(item => item.remaining === 0);
             const weekLabels = ["Week 1–2", "Week 2–3", "Week 3–4"];
 
             return remainingUpside.map((item, i) => (
               <div key={item.leverId} style={{
                 background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)",
                 borderRadius: 14, padding: 22, marginBottom: 14,
-                opacity: item.remaining === 0 ? 0.5 : 1,
+                opacity: (!allAtTarget && item.remaining === 0) ? 0.5 : 1,
                 transition: "all 0.4s ease",
               }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14, flexWrap: "wrap" }}>
@@ -746,7 +751,14 @@ export default function KitaGrowthEngine() {
                   }}>
                     {item.lever} lever
                   </div>
-                  {item.remaining > 0 ? (
+                  {allAtTarget ? (
+                    <div style={{
+                      fontSize: 11, color: "rgba(107,142,80,0.7)", fontFamily: "'DM Sans', sans-serif",
+                      marginLeft: "auto",
+                    }}>
+                      Target: {LEVERS.find(l => l.id === item.leverId).prefix || ""}{LEVERS.find(l => l.id === item.leverId).targetValue}{LEVERS.find(l => l.id === item.leverId).unit}
+                    </div>
+                  ) : item.remaining > 0 ? (
                     <div style={{
                       fontSize: 11, color: "rgba(107,180,80,0.7)", fontFamily: "'DM Sans', sans-serif",
                       marginLeft: "auto",
@@ -820,9 +832,7 @@ export default function KitaGrowthEngine() {
                 Sidharth Sundaram
               </div>
               <div style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", lineHeight: 1.6, marginBottom: 16 }}>
-                Product manager with 4 years in EdTech, now pursuing an MS in Engineering Management at Purdue. 
-                I think in systems — connecting business strategy, user behavior, and what actually ships. 
-                Built this to show how I'd approach growth at Kita, not just analyze it.
+                Product manager with 4 years in B2B EdTech. MS in Engineering Management at Purdue. Looking for a summer growth internship.
               </div>
               <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
                 <a href="mailto:sundar84@purdue.edu" style={{
@@ -860,8 +870,8 @@ export default function KitaGrowthEngine() {
             Methodology
           </div>
           <div style={{ fontSize: 13, color: "rgba(255,255,255,0.35)", lineHeight: 1.7 }}>
-            Baseline assumptions are illustrative estimates drawn from publicly available context (YC listing, website, 
-            industry benchmarks). The model compounds retention monthly and grows leads at the specified rate. 
+            Baseline assumptions are placeholders for a post-YC-launch B2B startup — they're meant to be replaced 
+            with real numbers. The model compounds retention monthly and grows leads at the specified rate. 
             Activation is modeled as driving ~40% of new customer conversion variance, with the remainder attributed to 
             sales effort, market timing, and other factors. 
             Lever cards show independent effects (one lever changed, others at baseline). The MRR chart shows the combined 
