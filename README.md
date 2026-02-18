@@ -4,7 +4,7 @@ An interactive growth model for [Kita](https://usekita.com) (YC W26) — documen
 
 Drag the sliders to see how retention, activation, and monetization each move Month 12 MRR. Assumptions are editable — plug in real numbers to make it yours.
 
-**[Live Demo →](https://your-vercel-url.vercel.app)**
+**[Live Demo →](https://kita-growth.vercel.app/)**
 
 ## What This Is
 
