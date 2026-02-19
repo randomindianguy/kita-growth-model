@@ -193,7 +193,7 @@ function AssumptionInput({ id, meta, value, onChange }) {
 }
 
 function MRRChart({ assumptions, churn, arpu, activation }) {
-  const months = [0, 3, 6, 9, 12, 15, 18];
+  const months = [0, 3, 6, 9, 12];
   const baseline = months.map(m => calculateMRR(assumptions, assumptions.churnRate, assumptions.arpu, assumptions.activationRate, m));
   const projected = months.map(m => calculateMRR(assumptions, churn, arpu, activation, m));
   const maxVal = Math.max(...projected, ...baseline) * 1.08;
@@ -232,20 +232,20 @@ function MRRChart({ assumptions, churn, arpu, activation }) {
           </text>
         ))}
         {(() => {
-          const projY = chartH - (projected[6] / maxVal) * (chartH - 10) - 10;
-          const baseY = chartH - (baseline[6] / maxVal) * (chartH - 10) - 10;
+          const projY = chartH - (projected[4] / maxVal) * (chartH - 10) - 10;
+          const baseY = chartH - (baseline[4] / maxVal) * (chartH - 10) - 10;
           const tooClose = Math.abs(projY - baseY) < 18;
-          const same = formatMRR(projected[6]) === formatMRR(baseline[6]);
+          const same = formatMRR(projected[4]) === formatMRR(baseline[4]);
           return (
             <>
               <text x={395} y={same ? projY : projY} textAnchor="end"
                 fill="rgba(107,142,80,0.9)" fontSize="13" fontWeight="700" fontFamily="DM Sans, sans-serif">
-                {formatMRR(projected[6])}
+                {formatMRR(projected[4])}
               </text>
               {!same && (
                 <text x={395} y={tooClose ? baseY + 18 : baseY} textAnchor="end"
                   fill="rgba(255,255,255,0.3)" fontSize="11" fontFamily="DM Sans, sans-serif">
-                  {formatMRR(baseline[6])} baseline
+                  {formatMRR(baseline[4])} baseline
                 </text>
               )}
             </>
@@ -445,7 +445,7 @@ export default function KitaGrowthEngine() {
         pointerEvents: "none",
       }} />
 
-      <div style={{ maxWidth: 640, margin: "0 auto", padding: "40px 20px 60px", position: "relative" }}>
+      <div style={{ maxWidth: 800, margin: "0 auto", padding: "40px 20px 60px", position: "relative" }}>
 
         {/* Header */}
         <div style={{ marginBottom: 32, animation: "fadeIn 0.6s ease" }}>
